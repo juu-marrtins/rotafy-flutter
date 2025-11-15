@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:rotafy/Widgets/driver_or_passanger.dart';
+import 'package:rotafy/Widgets/passanger_or_driver.dart';
 import 'package:rotafy/Widgets/search.dart';
 import 'package:rotafy/Widgets/tool_circle.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,7 +24,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
     _fetchRides();
   }
 
-  Future<void> _fetchRides() async {
+  Future<void> _fetchRides({String? search}) async {     
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
@@ -36,8 +37,10 @@ class _DriverHomePageState extends State<DriverHomePage> {
         queryParameters: {
           'per_page': '15',
           'page': '1',
+          'search': search ?? '',        
         },
       );
+
       final response = await http.get(
         url,
         headers: {
@@ -80,15 +83,21 @@ class _DriverHomePageState extends State<DriverHomePage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
-                children: const [
-                  ToolCircle(),
-                  SizedBox(width: 20),
-                  DriverOrPassanger(),
-                ],
-              ),
+                  children: [
+                    const ToolCircle(),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: DriverOrPassanger(),
+                    ),
+                  ],
+                )
             ),
             const SizedBox(height: 25),
-            Search(),
+            Search(
+              onChanged: (text) {
+                _fetchRides(search: text);
+              },
+            ),
             const SizedBox(height: 20),
             Expanded(
               child: Container(
@@ -126,14 +135,14 @@ class _DriverHomePageState extends State<DriverHomePage> {
                 ),
               ),
             ),
-
             const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
                   Expanded(
-                    child: _bottomButton("Excluir", Colors.white, Colors.black),
+                    child:
+                        _bottomButton("Excluir", Colors.white, Colors.black),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -239,7 +248,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                 return Padding(
                   padding: const EdgeInsets.only(top: 2),
                   child: Text(
-                    "- ${p['user']['name']} (${p['user']['type']})",
+                    "- ${p['user']['name']} (${p['user']['title']})",
                     style: const TextStyle(fontSize: 12),
                   ),
                 );

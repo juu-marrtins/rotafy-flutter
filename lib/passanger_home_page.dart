@@ -17,27 +17,28 @@ class _PassangerHomePageState extends State<PassangerHomePage> {
   List<dynamic> rides = [];
   String? errorMessage;
 
-  @override 
+  @override
   void initState() {
     super.initState();
-    _fetchRides();
+    _fetchRides(); 
   }
 
-  Future<void> _fetchRides() async {
+  Future<void> _fetchRides({String? search}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      
+
       if (token == null || token.isEmpty) {
         throw Exception('Token não encontrado');
       }
 
-      final url = Uri.parse('http://localhost:8000/api/races').replace(
-        queryParameters: {
-          'per_page': '15',
-          'page': '1',
-        },
-      );
+      final params = {
+        'per_page': '15',
+        'page': '1',
+        'search': search ?? '',
+      };
+
+      final url = Uri.http('localhost:8000', '/api/races', params);
 
       final response = await http.get(
         url,
@@ -60,7 +61,8 @@ class _PassangerHomePageState extends State<PassangerHomePage> {
         Navigator.of(context).pushReplacementNamed('/login');
       } else {
         final errorBody = jsonDecode(response.body);
-        errorMessage = 'Erro ${response.statusCode}: ${errorBody['message'] ?? 'Erro desconhecido'}';
+        errorMessage =
+            'Erro ${response.statusCode}: ${errorBody['message'] ?? 'Erro desconhecido'}';
       }
     } catch (e) {
       errorMessage = 'Erro de conexão: $e';
@@ -86,7 +88,11 @@ class _PassangerHomePageState extends State<PassangerHomePage> {
               ),
             ),
             const SizedBox(height: 25),
-            const Search(),
+            Search(
+              onChanged: (text) {
+                _fetchRides(search: text);
+              },
+            ),
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.all(16),
@@ -138,8 +144,18 @@ class _PassangerHomePageState extends State<PassangerHomePage> {
                       ),
                     ),
                     Text(
-                      ride['driver_type'],
+                      ride['driver_title'],
                       style: const TextStyle(color: Color(0xFF0B132B)),
+                    ),
+
+                    // PREÇO AQUI
+                    Text(
+                      "R\$ ${ride['value']}",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Color(0xFF1D3557),
+                      ),
                     ),
                   ],
                 ),

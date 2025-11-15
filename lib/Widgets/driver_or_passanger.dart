@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rotafy/passanger_home_page.dart';
 
 class DriverOrPassanger extends StatefulWidget {
   const DriverOrPassanger({super.key});
@@ -8,6 +9,8 @@ class DriverOrPassanger extends StatefulWidget {
 }
 
 class _DriverOrPassangerState extends State<DriverOrPassanger> {
+  bool isPassenger = true; 
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -22,11 +25,25 @@ class _DriverOrPassangerState extends State<DriverOrPassanger> {
       ),
       child: Row(
         children: [
-          Expanded(
-            child: InkWell(
-              onTap: () {
-                Navigator.pop(context);
-              },
+          GestureDetector(
+            onTap: () {
+              setState(() => isPassenger = true);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const PassangerHomePage(),
+                ),
+              );
+            },
+            child: Container(
+              width: 115,
+              decoration: BoxDecoration(
+                color: isPassenger ? Color(0xFF0B132B) :Color(0xFFA8E63E),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  bottomLeft: Radius.circular(30),
+                ),
+              ),
               child: const Center(
                 child: Text(
                   "Passageiro",
@@ -38,29 +55,35 @@ class _DriverOrPassangerState extends State<DriverOrPassanger> {
               ),
             ),
           ),
-          Container(
-            width: 115,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(30),
-                bottomRight: Radius.circular(30),
-              ),
-            ),
-            child: const Center(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.directions_car, color: Colors.black, size: 18),
-                  SizedBox(width: 6),
-                  Text(
-                    "Motorista",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() => isPassenger = false);
+              },
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
                   ),
-                ],
+                ),
+                child: const Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.directions_car, color: Color(0xFF0B132B), size: 18),
+                      SizedBox(width: 6),
+                      Text(
+                        "Motorista",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),

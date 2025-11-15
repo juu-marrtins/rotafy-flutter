@@ -69,6 +69,51 @@ class _PassangerHomePageState extends State<PassangerHomePage> {
     }
   }
 
+  Future<void> _sendRaceRequest(int raceId, BuildContext context) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Token não encontrado")),
+        );
+        return;
+      }
+
+      final url = Uri.parse(
+        "http://localhost:8000/api/request_race?race_id=$raceId",
+      );
+
+      final response = await http.post(
+        url,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        },
+      );
+
+      if (response.statusCode == 201) {
+        final body = jsonDecode(response.body);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(body["message"] ?? "Solicitação enviada")),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Erro ${response.statusCode} ao solicitar corrida"),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erro: $e")),
+      );
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -147,8 +192,6 @@ class _PassangerHomePageState extends State<PassangerHomePage> {
                       ride['driver_title'],
                       style: const TextStyle(color: Color(0xFF0B132B)),
                     ),
-
-                    // PREÇO AQUI
                     Text(
                       "R\$ ${ride['value']}",
                       style: const TextStyle(
@@ -201,7 +244,9 @@ class _PassangerHomePageState extends State<PassangerHomePage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () async {
+                  await _sendRaceRequest(ride['id'], context);
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF1D3557),
                   shape: RoundedRectangleBorder(

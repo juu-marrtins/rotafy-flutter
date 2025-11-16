@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rotafy/login_page.dart';
 import 'package:rotafy/register_page.dart';
 
 void main() {

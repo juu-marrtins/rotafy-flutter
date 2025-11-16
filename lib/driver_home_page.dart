@@ -4,6 +4,7 @@ import 'package:rotafy/Widgets/driver_or_passanger.dart';
 import 'package:rotafy/Widgets/passanger_or_driver.dart';
 import 'package:rotafy/Widgets/search.dart';
 import 'package:rotafy/Widgets/tool_circle.dart';
+import 'package:rotafy/create_race.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -151,10 +152,15 @@ class _DriverHomePageState extends State<DriverHomePage> {
                   ),
                   const SizedBox(width: 10),
                   FloatingActionButton(
-                    backgroundColor: const Color(0xFFA8E63E),
-                    onPressed: () {},
-                    child: const Icon(Icons.add, color: Colors.black),
-                  ),
+                  backgroundColor: const Color(0xFFA8E63E),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const CreateRace()),
+                    );
+                  },
+                  child: const Icon(Icons.add, color: Colors.black),
+                ),
                 ],
               ),
             ),
